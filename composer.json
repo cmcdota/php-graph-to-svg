@@ -1,0 +1,20 @@
+{
+    "name": "cmcdota/php-graph-to-svg",
+    "description": "Compiles SVG graph based on force-directed layout Fruchterman-Reingold Algorithm.",
+    "type": "library",
+    "require-dev": {
+        "symfony/var-dumper": "^5.2"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Cmcdota\\PhpGraphToSvg\\": "PhpGraphToSvg/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Timur Bayan",
+            "email": "cmcdota@gmail.com"
+        }
+    ]
+}
