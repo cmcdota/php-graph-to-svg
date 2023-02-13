@@ -3,7 +3,6 @@
 namespace Cmcdota\PhpGraphToSvg;
 
 
-
 class Board
 {
     public array $Vertexes;
@@ -17,13 +16,14 @@ class Board
 
     private float $defaultSpace;
 
-    private bool $debug = true;
+    private bool $debug;
 
     private float $temperatureDecrease;
 
 
-    public function __construct($array)
+    public function __construct($array, bool $debug = false)
     {
+        $this->debug = $debug;
         $this->temperature = 15;
         $this->steps = 100;
         $this->temperatureDecrease = $this->temperature / $this->steps;
@@ -36,7 +36,7 @@ class Board
         $this->boardHeight = $this->defaultVertexHeight * count($array) * 2;
         $boardSize = $this->boardWidth * $this->boardHeight;
 
-        $this->defaultSpace = sqrt($boardSize)/4 ;
+        $this->defaultSpace = sqrt($boardSize) / 4;
 
         //4) Расчет идеального размера расстояния.
         $this->perfectDistance = sqrt($boardSize / (count($array))) / 2;
@@ -129,7 +129,7 @@ class Board
 
     public function draw()
     {
-        $svg = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xedge="http://www.w3.org/1999/xedge" version="1.1" 
+        $svg = '<svg xmlns="http://www.w3.org/2000/svg"
              width="' . ($this->boardWidth + 100) . 'px"
              height="' . ($this->boardHeight + 100) . 'px" viewBox="-5 -5 ' . $this->boardWidth . ' ' . $this->boardHeight . '">
             <g>';

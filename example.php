@@ -29,7 +29,7 @@ $array = [
 ];
 
 
-$board = new Board($array);
+$board = new Board($array, true);
 $svg = $board->draw();
 
 file_put_contents("step1.svg", $svg);
