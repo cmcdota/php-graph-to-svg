@@ -48,11 +48,11 @@ class Vertex
             //$attraction - на какую дистанцию нужно придвинуть друг к другу две вершины
 
             list($sourceX, $sourceY, $targetX, $targetY) = $edge->getX1Y1X2Y2();
-            $this->dispatchX += $this->smallerOrBigger($sourceX, $targetX) * $repel;
-            $this->dispatchY += $this->smallerOrBigger($sourceY, $targetY) * $repel;
+            $this->dispatchX += $this->smallerOrBigger($sourceX, $targetX) * $repel / $distance / 10;
+            $this->dispatchY += $this->smallerOrBigger($sourceY, $targetY) * $repel / $distance / 10;
 
-            $this->dispatchX -= $this->smallerOrBigger($sourceX, $targetX) * $attraction;
-            $this->dispatchY -= $this->smallerOrBigger($sourceY, $targetY) * $attraction;
+            $this->dispatchX -= $this->smallerOrBigger($sourceX, $targetX) * $attraction / $distance / 10;
+            $this->dispatchY -= $this->smallerOrBigger($sourceY, $targetY) * $attraction / $distance / 10;
         }
         //$this->dispatchX = $this->dispatchX ;
         //$this->dispatchY = $this->dispatchY ;
@@ -63,9 +63,9 @@ class Vertex
     function smallerOrBigger($one, $two)
     {
         if ($one < $two) {
-            return ($one - $two);
+            return abs($one - $two) * -1;
         } else {
-            return ($one - $two);
+            return abs($one - $two);
         }
     }
 
@@ -79,13 +79,13 @@ class Vertex
         $this->y += $this->dispatchY;
 
         if ($this->x >= $maxWidth) {
-            $this->x = $maxWidth - 30;
+            $this->x = $maxWidth - $this->width;
         }
         if ($this->x < 0) {
             $this->x = 10;
         }
         if ($this->y >= $maxHeight) {
-            $this->y = $maxHeight - 30;
+            $this->y = $maxHeight - $this->height;
         }
         if ($this->y < 0) {
             $this->y = 10;

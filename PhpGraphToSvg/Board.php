@@ -7,7 +7,7 @@ include_once "../vendor/autoload.php";
 $array = [
     0 => [
         'name' => 'stage 0'
-        , 'edges' => [1, 2, 3]
+        , 'edges' => [1,  3]
     ],
     1 => [
         'name' => 'stage 1'
@@ -19,6 +19,10 @@ $array = [
     ],
     3 => [
         'name' => 'stage 3'
+        , 'edges' => []
+    ],
+    4 => [
+        'name' => 'stage 4'
         , 'edges' => []
     ],
 
