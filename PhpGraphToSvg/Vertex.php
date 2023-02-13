@@ -15,7 +15,6 @@ class Vertex
     private int $height;
     private int $width;
     private bool $calculated = false;
-    private bool $moved = false;
     private float $dispatchX;
     private float $dispatchY;
     private float $perfectDistance;
@@ -28,13 +27,14 @@ class Vertex
         $this->x = $x;
         $this->y = $y;
         $this->perfectDistance = $perfectDistance;
+        $this->desc = "Description for future";
         return $this;
     }
 
     public function calculateMoving(): array
     {
         //Проходимся по всем линкам, считаем насколько их надо сдвинуть
-        $this->moved = false;
+
         $this->dispatchX = 0;
         $this->dispatchY = 0;
         foreach ($this->getedges() as $edge) {
@@ -77,14 +77,14 @@ class Vertex
         $this->x += $this->dispatchX;
         $this->y += $this->dispatchY;
 
-        if ($this->x + $this->width/2 >= $maxWidth) {
-            $this->x = $maxWidth - $this->width/2;
+        if ($this->x + $this->width / 2 >= $maxWidth) {
+            $this->x = $maxWidth - $this->width / 2;
         }
         if ($this->x < 0) {
             $this->x = 10;
         }
-        if ($this->y + $this->height/2 >= $maxHeight) {
-            $this->y = $maxHeight - $this->height/2;
+        if ($this->y + $this->height / 2 >= $maxHeight) {
+            $this->y = $maxHeight - $this->height / 2;
         }
         if ($this->y < 0) {
             $this->y = 10;
@@ -93,7 +93,6 @@ class Vertex
         $this->dispatchX = 0;
         $this->dispatchY = 0;
 
-        $this->moved = true;
         $this->calculated = false;
     }
 
@@ -127,11 +126,6 @@ class Vertex
         return $this->name ?? 'name is missing';
     }
 
-    public function getDesc()
-    {
-        return $this->desc ?? '';
-    }
-
     /**
      * @return Edge[]
      */
@@ -154,6 +148,22 @@ class Vertex
     public function getDispatchY(): float
     {
         return round($this->dispatchY, 1);
+    }
+
+    /**
+     * @return string
+     */
+    public function getDesc(): string
+    {
+        return $this->desc;
+    }
+
+    /**
+     * @param string $desc
+     */
+    public function setDesc(string $desc): void
+    {
+        $this->desc = $desc;
     }
 
 }

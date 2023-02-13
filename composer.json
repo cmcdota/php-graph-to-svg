@@ -3,7 +3,7 @@
     "description": "Compiles SVG graph based on force-directed layout Fruchterman-Reingold Algorithm.",
     "type": "library",
     "require": {
-        "php": ">=5.4"
+        "php": ">=7.4"
     },
     "require-dev": {
         "symfony/var-dumper": "^5.2"
