@@ -10,7 +10,6 @@
   "require": {
     "php": ">=7.4"
   },
-  "minimum-stability": "dev",
   "license": "Apache-2.0",
   "autoload": {
     "classmap": [
