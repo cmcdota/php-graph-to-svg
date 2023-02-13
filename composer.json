@@ -5,9 +5,6 @@
   "require": {
     "php": ">=7.4"
   },
-  "require-dev": {
-    "symfony/var-dumper": "^5.2"
-  },
   "minimum-stability": "stable",
   "license": "Apache-2.0",
   "autoload": {
