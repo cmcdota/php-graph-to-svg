@@ -2,47 +2,6 @@
 
 namespace Cmcdota\PhpGraphToSvg;
 
-include_once "../vendor/autoload.php";
-
-$array = [
-    0 => [
-        'name' => 'stage 0'
-        , 'edges' => [1,  3]
-    ],
-    1 => [
-        'name' => 'stage 1'
-        , 'edges' => []
-    ],
-    2 => [
-        'name' => 'stage 2'
-        , 'edges' => []
-    ],
-    3 => [
-        'name' => 'stage 3'
-        , 'edges' => []
-    ],
-    4 => [
-        'name' => 'stage 4'
-        , 'edges' => []
-    ],
-
-];
-
-
-$board = new Board($array);
-$svg = $board->draw();
-//header("Content-Type: image/svg+xml");
-file_put_contents("step1.svg", $svg);
-echo "<html>
-<img src='step1.svg' border='5'>
-</html>";
-
-for ($i = 2; $i <= 100; $i++) {
-    $board->calculateAndMove();
-    $svg = $board->draw();
-    file_put_contents("step{$i}.svg", $svg);
-    echo "<html><img src='step{$i}.svg' border='5'></html>";
-}
 
 
 class Board
@@ -70,13 +29,14 @@ class Board
         $this->temperatureDecrease = $this->temperature / $this->steps;
 
         $this->defaultVertexWidth = 100;
-        $this->defaultVertexHeight = 100;
-        $this->defaultSpace = 200;
+        $this->defaultVertexHeight = 50;
 
         //1) Инициализация доски, расчет размера доски.
         $this->boardWidth = $this->defaultVertexWidth * count($array) * 2;
         $this->boardHeight = $this->defaultVertexHeight * count($array) * 2;
         $boardSize = $this->boardWidth * $this->boardHeight;
+
+        $this->defaultSpace = sqrt($boardSize)/4 ;
 
         //4) Расчет идеального размера расстояния.
         $this->perfectDistance = sqrt($boardSize / (count($array))) / 2;
@@ -88,7 +48,6 @@ class Board
         $this->initVertexedges($array);
 
 
-        dump("perfectDistance K =" . $this->perfectDistance);
         //5) Функция расчета в каждой вершине каждого connection.
         $this->calculate();
     }
@@ -122,7 +81,6 @@ class Board
                 $x = $startPointX + $this->defaultSpace * $cos;
                 $y = $startPointY + $this->defaultSpace * $sin;
             }
-            //dump($cos, $sin, $x, $y);
             $Vertexes[$key] = new Vertex($x, $y, $data['name'], $this->defaultVertexWidth, $this->defaultVertexHeight, $this->perfectDistance);
         }
         return $Vertexes;

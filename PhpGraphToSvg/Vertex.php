@@ -42,7 +42,6 @@ class Vertex
             $distance = $edge->calculateDistanceBetweenVertexes();
             //Считаем, насколько нужно сдвинуться в сторону вектора
             list($repel, $attraction) = $edge->calculateMovingEdgeVertexes();
-            //dump($moveCoefficient);
 
             //$repel - показывает на столько пикселей нужно отодвинуть друг от друга две вершины
             //$attraction - на какую дистанцию нужно придвинуть друг к другу две вершины
@@ -78,14 +77,14 @@ class Vertex
         $this->x += $this->dispatchX;
         $this->y += $this->dispatchY;
 
-        if ($this->x >= $maxWidth) {
-            $this->x = $maxWidth - $this->width;
+        if ($this->x + $this->width/2 >= $maxWidth) {
+            $this->x = $maxWidth - $this->width/2;
         }
         if ($this->x < 0) {
             $this->x = 10;
         }
-        if ($this->y >= $maxHeight) {
-            $this->y = $maxHeight - $this->height;
+        if ($this->y + $this->height/2 >= $maxHeight) {
+            $this->y = $maxHeight - $this->height/2;
         }
         if ($this->y < 0) {
             $this->y = 10;
