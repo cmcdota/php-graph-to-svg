@@ -19,13 +19,15 @@ $vertexes = [
     12 => ['name' => '12', 'edges' => [9,11]],
 ];
 $params=[
-    'randomSpawn' => false
+    'randomSpawn' => true
 ];
 $board = new Board($vertexes, $params);
 echo "<html lang='EN'>";
 for ($i = 1; $i <= 10; $i++) {
     $svg = $board->renderSVG();
     file_put_contents("step$i.svg", $svg);
-    echo "<div style='width:50%'><img src='step$i.svg'  alt='next step' border='1'></div>";
+    echo "<div style='width:50%;height: 50%'>
+        <img src='step$i.svg'  alt='next step' border='1' width='100%' height='100%'>
+        </div>";
     $board->calculateAndMove(10);
 }

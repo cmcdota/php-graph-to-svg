@@ -29,8 +29,6 @@ class Board
 
     public function __construct(array $vertexArray, array $params = null)
     {
-        //Default temperature that limits movement speed
-        $this->temperature = 100;
 
         //Size of boxes
         $this->defaultVertexWidth = 120;
@@ -46,6 +44,10 @@ class Board
         //4) Расчет идеального размера расстояния.
         $this->perfectDistance = sqrt($boardAreaSize / count($vertexArray)) / 4;
         $this->defaultSpace = $this->perfectDistance * 2;
+
+
+        //Default temperature that limits movement speed
+        $this->temperature = $this->perfectDistance;
 
         if (is_array($params)) {
             //You may reassign any parameter
@@ -166,6 +168,30 @@ class Board
         return $this;
     }
 
+    public function getMinimalMaximumXY($paddingX = 0, $paddingY = 0): array
+    {
+        $xMin = null;
+        $yMin = null;
+        $xMax = null;
+        $yMax = null;
+        foreach ($this->Vertexes as $Vertex) {
+            list($x, $y) = $Vertex->getXY();
+            if ($x > $xMax || $xMax === null) {
+                $xMax = $x;
+            }
+            if ($y > $yMax || $yMax === null) {
+                $yMax = $y;
+            }
+            if ($x < $xMin || $xMin === null) {
+                $xMin = $x;
+            }
+            if ($y < $yMin || $yMin === null) {
+                $yMin = $y;
+            }
+        }
+        return [$xMin , $yMin, $xMax + $paddingX, $yMax + $paddingY, $xMax - $xMin + $paddingX, $yMax - $yMin + $paddingY + $paddingY + $paddingY + $paddingY];
+    }
+
     /**
      * Generates SVG for given state
      * Feel free to create your renderer, just take vertexes from getVertexes();
@@ -174,12 +200,14 @@ class Board
      */
     public function renderSVG(): string
     {
-        $svg = '<svg xmlns="http://www.w3.org/2000/svg"
-             width="' . ($this->boardWidth + 100) . 'px"
-             height="' . ($this->boardHeight + 100) . 'px" viewBox="-5 -5 ' . $this->boardWidth . ' ' . $this->boardHeight . '">
-            <g>
-            ';
+        //Get size and paddings:
+        list($xMin, $yMin, $xMax, $yMax, $xWidth, $yHeight) = $this->getMinimalMaximumXY($this->defaultVertexWidth, $this->defaultVertexHeight);
+        $svg = "<svg xmlns='http://www.w3.org/2000/svg'
+             width='" . ($xWidth) . "px'
+             height='" . ($yHeight) . "px' viewBox='$xMin $yMin " . ($xWidth) . " " . ($yHeight) . "'>
+            <g>";
 
+        //Edges:
         foreach ($this->Vertexes as $Vertex) {
             foreach ($Vertex->getedges() as $edge) {
                 list($x1, $y1, $x2, $y2) = $edge->getX1Y1X2Y2(true);
@@ -202,6 +230,7 @@ class Board
             }
         }
 
+        //Vertexes:
         foreach ($this->Vertexes as $Vertex) {
             $svg .= "<rect x='{$Vertex->getX()}' y='{$Vertex->getY()}' width='$this->defaultVertexWidth' height='$this->defaultVertexHeight' rx='9' ry='9' fill='#{$Vertex->getFill()}' stroke='rgb(0, 0, 0)' pointer-events='all'/>";
             $svg .= "<text x='" . ($Vertex->getX() + 5) . "' y='" . ($Vertex->getY() + 15) . "'>{$Vertex->getName()}</text>";
