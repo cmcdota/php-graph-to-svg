@@ -15,8 +15,8 @@ class Vertex
 
     public array $edges;
     public array $data;
-    private int $height;
-    private int $width;
+    protected int $height;
+    protected int $width;
     public string $fill;
     private bool $calculated = false;
     private float $displaceX;
@@ -35,7 +35,7 @@ class Vertex
      *
      * @throws Exception
      */
-    public function __construct(float $x, float $y, string $name, float $width, float $height, float $perfectDistance, $fill , array $data)
+    public function __construct(float $x, float $y, string $name, float $width, float $height, float $perfectDistance, $fill, array $data)
     {
         $this->name = $name;
         $this->width = $width;
@@ -67,7 +67,7 @@ class Vertex
         $this->displaceY = 0;
         foreach ($this->getedges() as $edge) {
 
-            $distance = $edge->calculateDistanceBetweenVertexes();
+            $distance = $edge->getDistance();
             //Calculating moving:
             //Считаем, насколько нужно сдвинуться в сторону вектора
             list($Repulse, $attraction) = $edge->calculateMovingEdgeVertexes();
@@ -174,6 +174,25 @@ class Vertex
         return $this->name ?? 'name is missing';
     }
 
+
+    public function getLen(): float
+    {
+        list($x, $y) = $this->getXY(true);
+        return sqrt($x * $x + $y * $y);
+    }
+
+    public function getNormalised(): array
+    {
+        list($x, $y) = $this->getXY(true);
+        $len = $this->getLen();
+        if ($len == 0) {
+            return [0, 0];
+        } else {
+            return [$x / $len, $y / $len];
+        }
+    }
+
+
     /**
      * @return Edge[]
      */
@@ -234,6 +253,38 @@ class Vertex
     public function setData(array $data): void
     {
         $this->data = $data;
+    }
+
+    /**
+     * @return int
+     */
+    public function getHeight(): int
+    {
+        return $this->height;
+    }
+
+    /**
+     * @param int $height
+     */
+    public function setHeight(int $height): void
+    {
+        $this->height = $height;
+    }
+
+    /**
+     * @return int
+     */
+    public function getWidth(): int
+    {
+        return $this->width;
+    }
+
+    /**
+     * @param int $width
+     */
+    public function setWidth(int $width): void
+    {
+        $this->width = $width;
     }
 
 

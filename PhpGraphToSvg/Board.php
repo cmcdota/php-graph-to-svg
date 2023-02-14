@@ -25,6 +25,7 @@ class Board
 
     private bool $debug = false;
     private bool $randomFill = false;
+    private bool $drawArrows = false;
 
 
     public function __construct(array $vertexArray, array $params = null)
@@ -62,6 +63,7 @@ class Board
 
             $this->randomSpawn = $params['randomSpawn'] ?? $this->randomSpawn;
             $this->randomFill = $params['randomFill'] ?? $this->randomFill;
+            $this->drawArrows = $params['drawArrows'] ?? $this->drawArrows;
         }
 
         //Init Vertexes
@@ -189,7 +191,7 @@ class Board
                 $yMin = $y;
             }
         }
-        return [$xMin , $yMin, $xMax + $paddingX, $yMax + $paddingY, $xMax - $xMin + $paddingX, $yMax - $yMin + $paddingY + $paddingY + $paddingY + $paddingY];
+        return [$xMin, $yMin, $xMax + $paddingX, $yMax + $paddingY, $xMax - $xMin + $paddingX, $yMax - $yMin + $paddingY + $paddingY + $paddingY + $paddingY];
     }
 
     /**
@@ -211,21 +213,29 @@ class Board
         foreach ($this->Vertexes as $Vertex) {
             foreach ($Vertex->getedges() as $edge) {
                 list($x1, $y1, $x2, $y2) = $edge->getX1Y1X2Y2(true);
-                $rgb = '150, 0, 0';
-                if ($edge->isAttractive()) {
-                    $rgb = '0, 0, 00';
-                }
+
                 if ($this->debug) {
                     $x1 -= 10;
                     $y1 -= 10;
                     $x2 += 10;
                     $y2 += 10;
+                    $rgb = '150, 0, 0';
                     $svg .= "<path d='M $x1 $y1 L $x2 $y2' fill='none' stroke='rgb($rgb)' stroke-miterlimit='10'
                       pointer-events='stroke'/>";
-                    $svg .= "<text font-size='6' x='" . (($x1 + $x2) / 2 - 30) . "' y='" . (($y1 + $y2) / 2 - 10) . "'>{$edge->getRepulseAttrString()} d=" . intval($edge->calculateDistanceBetweenVertexes()) . "R{$edge->getMoveRepulse()} A{$edge->getMoveAttraction()}</text>";
+                    $svg .= "<text font-size='6' x='" . (($x1 + $x2) / 2 - 30) . "' y='" . (($y1 + $y2) / 2 - 10) . "'>{$edge->getRepulseAttrString()} d=" . intval($edge->getDistance()) . "R{$edge->getMoveRepulse()} A{$edge->getMoveAttraction()}</text>";
                 } elseif ($edge->isMainEdge()) {
-                    $svg .= "<path d='M $x1 $y1 L $x2 $y2' fill='none' stroke='rgb($rgb)' stroke-miterlimit='10'
-                      pointer-events='stroke'/>";
+                    if ($this->drawArrows) {
+
+                        list($x2, $y2, $Vx1, $Vy1) = $edge->findTargetCollisionPoint();
+                        //dump([$x2, $y2, $Vx1, $Vy1]);
+
+                        $a = $edge->getAnArrow($x2,$y2, $Vx1, $Vy1);
+                        $svg .= "<path d='M {$a['x1']} {$a['y1']} L {$a['x2']} {$a['y2']} L {$a['x3']} {$a['y3']} Z' fill='#000' stroke='rgb(0,0,0)' />";
+
+
+                    }
+                    $rgb = '0, 0, 00';
+                    $svg .= "<path d='M $x1 $y1 L $x2 $y2' fill='none' stroke='rgb($rgb)'/>";
                 }
             }
         }

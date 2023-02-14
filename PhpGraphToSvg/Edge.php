@@ -50,7 +50,7 @@ class Edge
      */
     public function calculateRepulse(): float
     {
-        $distance = $this->calculateDistanceBetweenVertexes();
+        $distance = $this->getDistance();
         if ($distance == 0) {
             return 0;
         }
@@ -65,7 +65,7 @@ class Edge
      */
     public function calculateAttraction(): float
     {
-        $distance = $this->calculateDistanceBetweenVertexes();
+        $distance = $this->getDistance();
         $this->moveAttraction = 0;
         if ($this->isAttractive()) {
             return $this->moveAttraction = $distance * $distance / $this->perfectDistance;
@@ -80,11 +80,128 @@ class Edge
         return [$x1, $y1, $x2, $y2];
     }
 
-    public function calculateDistanceBetweenVertexes($centered = true): float
+    public function getDistance($centered = true): float
     {
         list($x1, $y1) = $this->sourceVertex->getXY($centered);
         list($x2, $y2) = $this->targetVertex->getXY($centered);
         return round(sqrt(($x1 - $x2) * ($x1 - $x2) + ($y1 - $y2) * ($y1 - $y2)), 1);
+    }
+
+    public function getGetLen(): float
+    {
+        list($x1, $y1) = $this->sourceVertex->getXY(true);
+        list($x2, $y2) = $this->targetVertex->getXY(true);
+        return round(sqrt(($x1) * ($x1) + ($y1) * ($y1)), 1);
+    }
+
+    /**
+     * Возвращает скалярное произведение двух векторов
+     *
+     * @return float
+     */
+    public function getScalar(): float
+    {
+        list($x1, $y1) = $this->sourceVertex->getXY(true);
+        list($x2, $y2) = $this->targetVertex->getXY(true);
+        return $x1 * $x2 + $y1 * $y2;
+    }
+
+
+    /**
+     * Находит точку соприкосновения с Target'ом, чтобы там нарисовать стрелку.
+     *
+     * @return array
+     */
+    public function findTargetCollisionPoint($sourceX = null, $sourceY = null, $targetX = null, $targetY = null, $borderSizeW = null, $borderSizeH = null): array
+    {
+        if (!isset($sourceX)) {
+            list($sourceX, $sourceY, $targetX, $targetY) = $this->getX1Y1X2Y2(true);
+            $borderSizeW = $this->targetVertex->getWidth() / 2;
+            $borderSizeH = $this->targetVertex->getHeight() / 2;
+        }
+
+        //Будем считать угол, если смотреть из центра Target в сторону Source, чтобы найти точку соприкосновения изнутри Target'а.
+        $Vx = $sourceX - $targetX;
+        $Vy = $sourceY - $targetY;
+
+        $vDistance = sqrt($Vx * $Vx + $Vy * $Vy);
+
+        //Нормализация, приводим к единице:
+        $Vx1 = $Vx / $vDistance;
+        $Vy1 = $Vy / $vDistance;
+
+        //Считаем, как быстрее мы доберемся до какой границы (вертикальной/горизонтальной)
+        if (abs($Vx1) / $borderSizeW > abs($Vy1) / $borderSizeH) {
+            $distanceToBorder = $borderSizeW;
+            $bestSpeedToBorder = abs($Vx1);
+        } else {
+            $distanceToBorder = $borderSizeH;
+            $bestSpeedToBorder = abs($Vy1);
+        }
+        $disposeX = $Vx1 * $distanceToBorder / $bestSpeedToBorder;
+        $disposeY = $Vy1 * $distanceToBorder / $bestSpeedToBorder;
+
+        return [$targetX + $disposeX, $targetY + $disposeY, $Vx1, $Vy1];
+    }
+
+    public function getAnArrow($x, $y, $Vx1, $Vy1)
+    {
+        $scale = 10;
+        $arrowPoints = [
+            0 => [0, 0],
+            1 => [3, 1],
+            2 => [3, -1],
+        ];
+
+        $ret = [
+            'x1' => $arrowPoints[0][0] * $scale,
+            'y1' => $arrowPoints[0][1] * $scale,
+
+            'x2' => $arrowPoints[1][0] * $scale,
+            'y2' => $arrowPoints[1][1] * $scale,
+
+            'x3' => $arrowPoints[2][0] * $scale,
+            'y3' => $arrowPoints[2][1] * $scale,
+        ];
+
+        $ret2 = [];
+        $ret2['x1'] = $x + $ret['x1'] * $Vx1 - $ret['y1'] * $Vy1;
+        $ret2['y1'] = $y + $ret['x1'] * $Vy1 + $ret['y1'] * $Vx1;
+
+        $ret2['x2'] = $x + $ret['x2'] * $Vx1 - $ret['y2'] * $Vy1;
+        $ret2['y2'] = $y + $ret['x2'] * $Vy1 + $ret['y2'] * $Vx1;
+
+        $ret2['x3'] = $x + $ret['x3'] * $Vx1 - $ret['y3'] * $Vy1;
+        $ret2['y3'] = $y + $ret['x3'] * $Vy1 + $ret['y3'] * $Vx1;
+
+
+        return $ret2;
+    }
+
+    public function subtractDistance($points): array
+    {
+        $scale = 1;
+        $distance = $this->getDistance();
+        if ($distance == 0) {
+            return $this->scaleDistance(0);
+        } else {
+            $newDistance = $distance - $points;
+            return $this->scaleDistance($newDistance / $distance);
+        }
+    }
+
+    public function scaleDistance(float $scale): array
+    {
+        list($sourceX, $sourceY, $targetX, $targetY) = $this->getX1Y1X2Y2(true);
+
+        $xV = $targetX - $sourceX;
+        $xV = $xV * $scale;
+        $xV = $xV + $sourceX;
+
+        $yV = $targetY - $sourceY;
+        $yV = $yV * $scale;
+        $yV = $yV + $sourceY;
+        return [$xV, $yV];
     }
 
     /**
@@ -156,6 +273,7 @@ class Edge
 
         $Ax = intval($this->getAttractionX());
         $Ay = intval($this->getAttractionY());
+
         return "r{$Rx}r$Ry a{$Ax}a$Ay";
     }
 

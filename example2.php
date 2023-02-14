@@ -58,15 +58,18 @@ $vertexes=[
 ];
 
 $params=[
-    'randomSpawn' => false
+    'randomSpawn' => false,
+    'drawArrows' => true
 ];
 $board = new Board($vertexes, $params);
+
 echo "<html lang='EN'>";
-for ($i = 1; $i <= 10; $i++) {
+for ($i = 1; $i <= 100; $i++) {
+
     $svg = $board->renderSVG();
     file_put_contents("step$i.svg", $svg);
     echo "<div style='width:50%;height: 50%'>
         <img src='step$i.svg'  alt='next step' border='1' width='100%' height='100%'>
         </div>";
-    $board->calculateAndMove(1);
+    $board->calculateAndMove();
 }

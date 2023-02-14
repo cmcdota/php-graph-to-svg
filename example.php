@@ -18,6 +18,7 @@ $vertexes = [
     11 => ['name' => '11', 'edges' => [10,8]],
     12 => ['name' => '12', 'edges' => [9,11]],
 ];
+
 $params=[
     'randomSpawn' => true
 ];
