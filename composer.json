@@ -2,9 +2,13 @@
   "name": "cmcdota/php-graph-to-svg",
   "description": "Compiles SVG graph based on force-directed layout Fruchterman-Reingold Algorithm.",
   "keywords": [
+    "php",
     "graph",
     "svg",
-    "force-directed"
+    "force-directed",
+    "Fruchterman",
+    "Reingold",
+    "Fruchterman-Reingold"
   ],
   "type": "library",
   "require": {
