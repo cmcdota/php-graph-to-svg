@@ -154,17 +154,17 @@ class Vertex
     }
 
 
-    public function getX($centered = false): float
+    public function getX(bool $centered = false): float
     {
         return round($this->x + ($centered ? $this->width / 2 : 0), 0);
     }
 
-    public function getY($centered = false): float
+    public function getY(bool $centered = false): float
     {
         return round($this->y + ($centered ? $this->height / 2 : 0), 0);
     }
 
-    public function getXY($centered = false): array
+    public function getXY(bool $centered = false): array
     {
         return [$this->getX($centered), $this->getY($centered)];
     }
@@ -286,6 +286,4 @@ class Vertex
     {
         $this->width = $width;
     }
-
-
 }

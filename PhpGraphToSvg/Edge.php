@@ -144,9 +144,8 @@ class Edge
         return [$targetX + $disposeX, $targetY + $disposeY, $Vx1, $Vy1];
     }
 
-    public function getAnArrow($x, $y, $Vx1, $Vy1)
+    public function getAnArrow(float $x, float $y, float $Vx1, float $Vy1, float $scale)
     {
-        $scale = 10;
         $arrowPoints = [
             0 => [0, 0],
             1 => [3, 1],
@@ -178,7 +177,7 @@ class Edge
         return $ret2;
     }
 
-    public function subtractDistance($points): array
+    public function subtractDistance(float $points): array
     {
         $scale = 1;
         $distance = $this->getDistance();

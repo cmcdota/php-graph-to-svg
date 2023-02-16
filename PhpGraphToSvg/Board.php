@@ -26,6 +26,7 @@ class Board
     private bool $debug = false;
     private bool $randomFill = false;
     private bool $drawArrows = false;
+    private float $arrowScale = 10;
 
 
     public function __construct(array $vertexArray, array $params = null)
@@ -64,6 +65,7 @@ class Board
             $this->randomSpawn = $params['randomSpawn'] ?? $this->randomSpawn;
             $this->randomFill = $params['randomFill'] ?? $this->randomFill;
             $this->drawArrows = $params['drawArrows'] ?? $this->drawArrows;
+            $this->arrowScale = $params['arrowScale'] ?? $this->arrowScale;
         }
 
         //Init Vertexes
@@ -85,7 +87,7 @@ class Board
      * @return Vertex[] array
      * @throws Exception
      */
-    public function initVertexes($array): array
+    public function initVertexes(array $array): array
     {
         //2) Приём массива, разместить первый элемент по центру, остальные по кругу.
         $startPointX = $this->boardWidth / 2;
@@ -126,7 +128,7 @@ class Board
         return $Vertexes;
     }
 
-    function initEdges($array)
+    function initEdges(array $array)
     {
         foreach ($this->Vertexes as $key => $Vertex) {
             foreach ($this->Vertexes as $key2 => $Vertex2) {
@@ -162,7 +164,7 @@ class Board
         return $this;
     }
 
-    public function calculateAndMove($moves = 1): Board
+    public function calculateAndMove(int $moves = 1): Board
     {
         for ($i = 1; $i <= $moves; $i++) {
             $this->calculate()->move();
@@ -170,7 +172,7 @@ class Board
         return $this;
     }
 
-    public function getMinimalMaximumXY($paddingX = 0, $paddingY = 0): array
+    public function getMinimalMaximumXY(float $paddingX = 0,float  $paddingY = 0): array
     {
         $xMin = null;
         $yMin = null;
@@ -206,8 +208,8 @@ class Board
         list($xMin, $yMin, $xMax, $yMax, $xWidth, $yHeight) = $this->getMinimalMaximumXY($this->defaultVertexWidth, $this->defaultVertexHeight);
         $svg = "<svg xmlns='http://www.w3.org/2000/svg'
              width='" . ($xWidth) . "px'
-             height='" . ($yHeight) . "px' viewBox='$xMin $yMin " . ($xWidth) . " " . ($yHeight) . "'>
-            <g>";
+             height='" . ($yHeight) . "px' viewBox='$xMin $yMin $xWidth $yHeight'>
+            <g>\n";
 
         //Edges:
         foreach ($this->Vertexes as $Vertex) {
@@ -220,34 +222,33 @@ class Board
                     $x2 += 10;
                     $y2 += 10;
                     $rgb = '150, 0, 0';
-                    $svg .= "<path d='M $x1 $y1 L $x2 $y2' fill='none' stroke='rgb($rgb)' stroke-miterlimit='10'
-                      pointer-events='stroke'/>";
-                    $svg .= "<text font-size='6' x='" . (($x1 + $x2) / 2 - 30) . "' y='" . (($y1 + $y2) / 2 - 10) . "'>{$edge->getRepulseAttrString()} d=" . intval($edge->getDistance()) . "R{$edge->getMoveRepulse()} A{$edge->getMoveAttraction()}</text>";
+                    $svg .= "<path d='M $x1 $y1 L $x2 $y2' fill='none' stroke='rgb($rgb)' stroke-miterlimit='10' pointer-events='stroke'/>\n";
+                    $svg .= "<text font-size='6' x='" . (($x1 + $x2) / 2 - 30) . "' y='" . (($y1 + $y2) / 2 - 10) . "'>{$edge->getRepulseAttrString()} d=" . intval($edge->getDistance()) . "R{$edge->getMoveRepulse()} A{$edge->getMoveAttraction()}</text>\n";
                 } elseif ($edge->isMainEdge()) {
                     if ($this->drawArrows) {
 
                         list($x2, $y2, $Vx1, $Vy1) = $edge->findTargetCollisionPoint();
                         //dump([$x2, $y2, $Vx1, $Vy1]);
 
-                        $a = $edge->getAnArrow($x2,$y2, $Vx1, $Vy1);
-                        $svg .= "<path d='M {$a['x1']} {$a['y1']} L {$a['x2']} {$a['y2']} L {$a['x3']} {$a['y3']} Z' fill='#000' stroke='rgb(0,0,0)' />";
+                        $a = $edge->getAnArrow($x2,$y2, $Vx1, $Vy1, $this->arrowScale);
+                        $svg .= "<path d='M {$a['x1']} {$a['y1']} L {$a['x2']} {$a['y2']} L {$a['x3']} {$a['y3']} Z' fill='#000' stroke='rgb(0,0,0)' />\n";
 
 
                     }
                     $rgb = '0, 0, 00';
-                    $svg .= "<path d='M $x1 $y1 L $x2 $y2' fill='none' stroke='rgb($rgb)'/>";
+                    $svg .= "<path d='M $x1 $y1 L $x2 $y2' fill='none' stroke='rgb($rgb)'/>\n";
                 }
             }
         }
 
         //Vertexes:
         foreach ($this->Vertexes as $Vertex) {
-            $svg .= "<rect x='{$Vertex->getX()}' y='{$Vertex->getY()}' width='$this->defaultVertexWidth' height='$this->defaultVertexHeight' rx='9' ry='9' fill='#{$Vertex->getFill()}' stroke='rgb(0, 0, 0)' pointer-events='all'/>";
-            $svg .= "<text x='" . ($Vertex->getX() + 5) . "' y='" . ($Vertex->getY() + 15) . "'>{$Vertex->getName()}</text>";
+            $svg .= "<rect x='{$Vertex->getX()}' y='{$Vertex->getY()}' width='$this->defaultVertexWidth' height='$this->defaultVertexHeight' rx='9' ry='9' fill='#{$Vertex->getFill()}' stroke='rgb(0, 0, 0)' pointer-events='all'/>\n";
+            $svg .= "<text x='" . ($Vertex->getX() + 5) . "' y='" . ($Vertex->getY() + 15) . "'>{$Vertex->getName()}</text>\n";
 
             if ($this->debug) {
-                $svg .= "<text font-size='6' x='" . $Vertex->getX() . "' y='" . (($Vertex->getY()) - 7) . "'>x{$Vertex->getX()} y{$Vertex->getY()}</text>";
-                $svg .= "<text font-size='6' x='" . $Vertex->getX() . "' y='" . (($Vertex->getY()) - 2) . "'>d{$Vertex->getDisplaceX()} : d{$Vertex->getDisplaceY()}</text>";
+                $svg .= "<text font-size='6' x='" . $Vertex->getX() . "' y='" . (($Vertex->getY()) - 7) . "'>x{$Vertex->getX()} y{$Vertex->getY()}</text>\n";
+                $svg .= "<text font-size='6' x='" . $Vertex->getX() . "' y='" . (($Vertex->getY()) - 2) . "'>d{$Vertex->getDisplaceX()} : d{$Vertex->getDisplaceY()}</text>\n";
 
             }
         }
